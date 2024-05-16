@@ -1,8 +1,19 @@
+using Microsoft.EntityFrameworkCore;
+using time_of_your_life.Data;
+using time_of_your_life.Interfaces;
+using time_of_your_life.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IPresetRepository, PresetRepository>();
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddDbContext<DataContext>(
+    opt => opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
