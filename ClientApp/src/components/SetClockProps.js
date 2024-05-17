@@ -285,6 +285,7 @@ function SetClockProps(props) {
                             <div>
                                 <input
                                     id="fontColor"
+                                    type = "color"
                                     value={fontColor}
                                     onChange={(e) => setFontColurUI(e)}
                                     onKeyDown={(e) => handleOnKeyDown(e)}
@@ -297,6 +298,7 @@ function SetClockProps(props) {
                             <div>
                                 <input
                                     id="clockFontColor"
+                                    type = "color"
                                     value={clockFontColor}
                                     onChange={(e) => setClockFontColurUI(e)}
                                     onKeyDown={(e) => handleOnKeyDown(e)}
