@@ -61,7 +61,7 @@ function SetClockProps(props) {
                     alert('Transaction failed. ' + result)
                 }
                 else {
-                    alert(data.id ? 'Preset saved successfuly.' : 'Preset updated successfuly')
+                    alert(id ? 'Preset saved successfuly.' : 'Preset updated successfuly')
 
                     const presetsList = await fetch('clock/presets')
                     const presetsData = await presetsList.json()
