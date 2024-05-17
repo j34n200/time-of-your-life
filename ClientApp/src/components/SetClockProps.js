@@ -3,6 +3,7 @@ import ClockProps from './ClockProps'
 
 function SetClockProps(props) {
     const clockProps = new ClockProps()
+    const [id, setId] = useState(null)
     const [titleText, setTitleText] = useState(clockProps.titleText)
     const [fontFamily, setFontFamily] = useState(clockProps.fontFamily)
     const [fontColor, setFontColor] = useState(clockProps.fontColor)
@@ -14,6 +15,8 @@ function SetClockProps(props) {
     const [loading, setLoading] = useState(true)
     const [isInputValid, setInputIsValid] = useState(true)
     const [open, setOpen] = useState(true)
+    const [timeZone, setTimeZone] = useState(clockProps.timeZone)
+    const [timeZones, setTimeZones] = useState([])
 
     useEffect(() => {
     ;(async () => {
@@ -21,8 +24,55 @@ function SetClockProps(props) {
         const data = await response.json()
         setPresets(data)
         setLoading(false)
+        const responseTimeZone = await fetch('timezones')
+        const dataTimeZone = await responseTimeZone.json()
+        setTimeZones(dataTimeZone)
+        setLoading(false)
     })()
     }, [])
+
+    const addOrUpdatePreset = async () => {
+        setClockProps()
+        let data = getProps()
+        if (data != null) {
+            let url = id ? `clock/presets/${id}` : 'clock/presets'
+            let method = id ? 'PUT' : 'POST'
+            let clockPropsRequest = {
+                Title: data.titleText,
+                FontFamily: data.fontFamily,
+                FontColor: data.fontColor,
+                ClockFontColor: data.clockFontColor,
+                TitleFontSize: data.titleFontSize,
+                ClockFontSize: data.clockFontSize,
+                BlinkColons: data.blinkColons,
+                TimeZone: data.timeZone
+            }
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(clockPropsRequest)
+                })
+
+                const result = await response.json()
+                if (!response.ok) {
+                    alert('Transaction failed. ' + result)
+                }
+                else {
+                    alert(data.id ? 'Preset saved successfuly.' : 'Preset updated successfuly')
+
+                    const presetsList = await fetch('clock/presets')
+                    const presetsData = await presetsList.json()
+                    setPresets(presetsData)
+                    setId(null)
+                }
+            } catch (e) {
+                console.error('Error:', e)
+            }
+        }
+    }
 
     const getProps = () => {
         const props = new ClockProps()
@@ -33,6 +83,7 @@ function SetClockProps(props) {
         props.fontColor = document.getElementById('fontColor').value
         props.clockFontColor = document.getElementById('clockFontColor').value
         props.blinkColons = document.getElementById('blinkColons').checked
+        props.timeZone = document.getElementById('timeZones').value
 
         return props
     }
@@ -103,6 +154,12 @@ function SetClockProps(props) {
         setClockProps()
     }
 
+    const setTimeZoneUI = () => {
+        setTimeZone(document.getElementById('timeZones').value)
+        clockProps.timeZone = document.getElementById('timeZones').value
+        setClockProps()
+    }
+
     const setCustomPreset = (p) => {
         let clockProps = new ClockProps()
 
@@ -114,7 +171,9 @@ function SetClockProps(props) {
         clockProps.titleFontSize = p.titleFontSize
         clockProps.clockFontSize = p.clockFontSize
         clockProps.blinkColons = p.blinkColons
+        clockProps.timeZone = p.timeZone
 
+        setId(p.id)
         setTitleText(p.title)
         setFontFamily(p.fontFamily)
         setFontColor(p.fontColor)
@@ -122,6 +181,7 @@ function SetClockProps(props) {
         setclockFontSize(p.clockFontsize)
         setBlinkColons(p.blinkColons)
         setClockFontColor(p.clockFontColor)
+        setTimeZone(p.timeZone)
 
         props.setClockProps(clockProps)
     }
@@ -256,10 +316,18 @@ function SetClockProps(props) {
                             </div>
                         </div>
                         <div>
+                            <div>Time Zones</div>
+                            <select id="timeZones" onChange={setTimeZoneUI} value={timeZone}>
+                                {timeZones.map((t) => (
+                                    <option key={t}>{t}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
                             <div>
                                 <button
                                     onClick={() =>
-                                        alert('This should save the preset to the sever.')
+                                        addOrUpdatePreset()
                                     }
                                 >
                                     Save Preset

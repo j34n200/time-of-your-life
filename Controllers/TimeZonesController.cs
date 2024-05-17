@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace time_of_your_life.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class TimeZonesController : ControllerBase
     {
